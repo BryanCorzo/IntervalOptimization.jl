@@ -1,4 +1,5 @@
-"""`meanvalueform` performs the second order extension on the given function `f` with its optional derivative `f_prime` and initial intervals `x` and  its midpoints `x_mid`."""
+"""`meanvalueform` performs the second order extension on the given function `f` with its optional derivative
+`f_prime` and initial intervals `x` and  its midpoints `x_mid`."""
 
 function meanvalueform(f::Function, f_prime::Function, x::IntervalBox, x_mid::IntervalBox)
 
@@ -24,7 +25,8 @@ meanvalueform(f::Function, x::IntervalBox) = meanvalueform(f, x->∇(f,x.v), x, 
 
 
 
-"""`smear` performs the election of the variable with the largest value of semar like direction to bisect on the given function `f` with its optional derivative `f_prime` and initial intervals `x`."""
+"""`smear` performs the election of the variable with the largest value of semar like direction to bisect on the given function `f`
+with its optional derivative `f_prime` and initial intervals `x`."""
 
 function smear(f::Function, f_prime::Function, x::IntervalBox)
 
@@ -38,3 +40,52 @@ end
 # use automatic differentiation if no derivative function given:
 
 smear(f::Function, x::IntervalBox) = smear(f, x->∇(f,x.v), x)
+
+
+"""`localoptim` performs a local optimization of a given function `f` on intervals `x`."""
+
+function localoptim(f::Function, X::StaticArray)
+
+    xc = X
+    gamma = 0.01
+    max_iters = 10
+
+    for i in 1:max_iters
+
+        x = xc
+        xc = x - gamma * ∇(f, x)
+
+        if f(xc) > f(x)
+
+            break
+
+        end
+
+    end
+
+    return (f(xc), xc)
+
+end
+
+
+"""`random` generates random numbers over intervals `x`."""
+
+randnum(r::SArray, x::IntervalBox) = (r * (x.hi - x.lo)) + x.lo
+
+function random(X::IntervalBox{N,T}, n::Int64) where {N,T}
+
+    Random_numbers = typeof(mid(X))[ ]
+
+    for i in 1:n
+
+        rand_numb = @SVector rand(N)
+
+        interval_rand_numb = randnum.(rand_numb, X)
+
+        push!(Random_numbers, interval_rand_numb)
+
+    end
+
+    return Random_numbers
+
+end
