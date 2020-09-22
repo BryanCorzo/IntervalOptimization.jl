@@ -1,5 +1,11 @@
 module IntervalOptimization
 
-# Write your package code here.
+using IntervalArithmetic
+using ForwardDiff
+
+const gradient = ForwardDiff.gradient
+const ∇ = gradient
+
+include("basic_functions.jl")
 
 end
